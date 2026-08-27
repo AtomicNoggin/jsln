@@ -1,0 +1,17 @@
+{
+  "name": "jsln",
+  "version": "0.0.1",
+  "description": "JavaScript Literal Notation: A lightweight data-interchange format based on modern javascript literal notation, and more",
+  "keywords": [
+    "JavaScript",
+    "JSON",
+    "data-exchange"
+  ],
+  "license": "Apache-2.0",
+  "author": "Patrick Denny",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --test"
+  }
+}
