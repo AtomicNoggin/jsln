@@ -10,8 +10,20 @@
   "license": "Apache-2.0",
   "author": "Patrick Denny",
   "type": "module",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
+    "build": "esbuild index.js --bundle --format=esm --platform=neutral --target=es2022 --outfile=dist/index.js",
+    "prepack": "npm run build",
     "test": "node --test"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
   }
 }
