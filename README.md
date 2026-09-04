@@ -1,6 +1,10 @@
 # JSLN
 
-JSLN (JavaScript Literal Notation pronounced JOS-LIN, or Joseline) is a JavaScript-literal data format parsed by this package's `JSLNParser`. It supports JSON-like objects and arrays, JavaScript primitives and numeric literals, comments, quoted and multiline strings, typed `@` values, and JSDoc type metadata.
+** This project is still a work in progress abd suybject to change w=ithout notice. Do not use in production at this time **
+
+JSLN (JavaScript Literal Notation pronounced JOS-LIN, or Joseline) is a JavaScript-literal data format parsed by this package's `JSLNParser`. It supports JSON-like objects and arrays, JavaScript primitives and numeric literals. 
+
+JSLN will also optionally allow comments, multiline (backtick) strings, typed `@` values, and JSDoc type metadata.
 
 ```js
 import JSLN from "jsln";
@@ -21,7 +25,12 @@ JSLN.stringify(value);
 
 Parses one complete JSLN member and returns its value. Trailing input throws a `SyntaxError`.
 
-`options.strictMode` defaults to `false`. In strict mode, comments, backtick strings, and escaped line terminators in strings are rejected.
+| Option | Default | Description |
+| --- | --- | --- |
+| `strictMode` | `false` | Optional. Possible values are `true` or `false`. In strict mode, comments, backtick strings, and escaped line terminators in strings are rejected. |
+| `ignoreMissing` | `'inArray'` | Optional. Possible values are `true`, `false`, `'inArray'`, or `'inObject'`. Whether to allow missing entry values or not. If `false`, a Type Error is thrown if a missing value is found in an Array or Object entry. If `true`, Array and Object entries with missing values are skipped by the parser. If set to `'inArray'` or `'inObject'`, the Parser will only allow missing entries in their respective types. |
+| `ignoreNull` | `false` | Optional. Possible values are `true`, `false`, `'inArray'`, or `'inObject'`. Whether to include `null` values or not. If `false`, `null` values ar accepted in Array and Object entries. If `true` Array and Object entries with `null` values are skipped by the parser. If set to `'inArray'` or `'inObject'`, the Parser will only skip `null` entries in their respective types. |
+| `ignoreUndefined` | `false` | Optional. Possible values are `true`, `false`, `'inArray'`, or `'inObject'`. Whether to include `undefined` values or not. If `false`, `undefined` values ar accepted in Array and Object entries. If `true` Array and Object entries with `undefined` values are skipped by the parser. If set to `'inArray'` or `'inObject'`, the Parser will only skip `undefined` entries in their respective types. |
 
 ### `JSLN.stringify(value, replacer, options)`
 
@@ -40,8 +49,7 @@ Returns a JSLN string. `replacer(key, value)` can transform values before serial
 
 ### Objects and Arrays
 
-Objects use identifier, single-quoted, or double-quoted keys. Arrays may contain missing entries.
-
+Objects use identifier, single-quoted, or double-quoted keys and trailing commas. Objects may also contain nested arrays and objects
 ```js
 {
   unquotedKey: 'value',
@@ -50,7 +58,13 @@ Objects use identifier, single-quoted, or double-quoted keys. Arrays may contain
 }
 ```
 
+By default Arrays may contain missing entries. Arrays may also contain trailing commas and nested Arrays and Objects
+```js
+[1,,3,,'five',['nested',],{}]
+```
 ### Primitives
+
+The following primitive values are accepted
 
 ```js
 null
@@ -64,16 +78,25 @@ Infinity
 "text"
 123
 -4.5
-.125
+0.125
 1.2e3
 0xff
 0o10
 0b10
-123n
+123456789000000n
 /a\\w+/gi
 ```
 
-Numbers support decimal, hexadecimal (`0x`), octal (`0o`), and binary (`0b`) notation. Numeric separators (`_`) are accepted between digits. Add `n` to produce a `BigInt`.
+Numbers support decimal, hexadecimal (`0x`), octal (`0o`), and binary (`0b`) notation.  Add `n` to produce a `BigInt`.
+
+Numeric values with leading zeros and or a leading defimal point are also accepted, as are numeric separators (`_`)  between digits.
+
+```js
+{
+  withLeadingZero: 000_123
+  withDecimal: .235
+}
+```
 
 Regular expressions use JavaScript literal syntax: `/pattern/flags`. Supported flags are `d`, `g`, `i`, `m`, `s`, `u`, `v`, and `y`.
 
@@ -121,7 +144,7 @@ A tag has the form `tag@value`. The parser includes the following built-in tags:
 
 ```js
 {
-  pattern: re@['a\\w+', 'gi'],
+  pattern: re@['a\\w+', 'gi'], 
   created: d@'2024-06-01T12:34:56.789Z',
   tags: set@['jsln', 'data'],
   bytes: u8@[1, 2, 3],
